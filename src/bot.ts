@@ -4,7 +4,7 @@ import interactionCreate from "./listeners/interactionCreate";
 
 require('dotenv').config()
 
-console.log("Bot is starting...");
+console.log("BookiBot is starting...");
 
 const client = new Client({
     intents: []
