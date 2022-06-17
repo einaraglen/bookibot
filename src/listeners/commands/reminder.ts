@@ -20,7 +20,7 @@ export const Reminder: Command = {
         const hasWill: Post | undefined = will && will[users[i]]
         const hasDid: Post | undefined = did && did[users[i]]
 
-        message.addField(`${username || 'USERNAME_MISSING'}`, `Will: ${hasWill ? '✅' : '⛔'} - Did: ${hasDid ? '✅' : '⛔'}`, true)
+        message.addField(`${username || 'USERNAME_MISSING'}`, `Will: ${hasWill ? '✅' : '⛔'} - Did: ${hasDid ? '✅' : '⛔'}`, false)
       }
     } else {
       message.setDescription('No Users Found')

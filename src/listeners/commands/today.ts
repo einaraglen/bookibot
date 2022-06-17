@@ -16,7 +16,7 @@ const handleNoOptions = async (type: "will" | "did"): Promise<string | MessageEm
         for (const id in entry) {
             const username: string | undefined = await getUsername(id)
             const post: Post = entry[id]
-            embed.addField(`${username || "USERNAME_MISSING"} ${type}:`, post.task, true)
+            embed.addField(`${username || "USERNAME_MISSING"} ${type}:`, post.task, false)
         }
         return embed
     }
