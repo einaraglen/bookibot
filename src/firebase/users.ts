@@ -2,26 +2,43 @@ import { setDoc, doc, getDoc, getDocs, Timestamp, collection, QueryDocumentSnaps
 import { db } from './db'
 
 export const addUser = async (id: string, username: string): Promise<void> => {
-  await setDoc(doc(db, "users", id), {
-    username,
-    created_at: Timestamp.fromDate(new Date()),
-  });
+  try {
+    await setDoc(doc(db, 'users', id), {
+      username,
+      created_at: Timestamp.fromDate(new Date()),
+    })
+  } catch (err) {
+    console.warn(err)
+  }
 }
 
 export const getUsers = async (): Promise<string[] | undefined> => {
-  const ref = collection(db, 'users')
-  const query = await getDocs(ref)
-  return query.docs.map((snap: QueryDocumentSnapshot<DocumentData>) => snap.id)
+  try {
+    const ref = collection(db, 'users')
+    const query = await getDocs(ref)
+    return query.docs.map((snap: QueryDocumentSnapshot<DocumentData>) => snap.id)
+  } catch (err) {
+    console.warn(err)
+  }
 }
 
 export const getUsername = async (id: string): Promise<string | undefined> => {
-  const ref = doc(db, 'users', id)
-  const snap = await getDoc(ref)
-  return snap.exists() && snap.data().username
+  try {
+    const ref = doc(db, 'users', id)
+    const snap = await getDoc(ref)
+    return snap.exists() && snap.data().username
+  } catch (err) {
+    console.warn(err)
+  }
 }
 
 export const isUser = async (id: string): Promise<boolean> => {
-  const ref = doc(db, 'users', id)
-  const snap = await getDoc(ref)
-  return snap.exists()
+  try {
+    const ref = doc(db, 'users', id)
+    const snap = await getDoc(ref)
+    return snap.exists()
+  } catch (err) {
+    console.warn(err)
+    return false
+  }
 }

@@ -8,26 +8,25 @@ import { Entry, Post } from 'src/firebase/types'
 const TYPE_INDEX = 0
 const USER_INDEX = 1
 
-
-const handleNoOptions = async (type: "will" | "did"): Promise<string | MessageEmbed> => {
-    const entry: Entry | undefined = await getToday(type)
-    if (entry) {
-        let embed = new MessageEmbed().setTitle(`Today the following tasks are listed for - ${type === "will" ? "🎯 Today I Will" : "🎉 Today I Did"}`)
-        for (const id in entry) {
-            const username: string | undefined = await getUsername(id)
-            const post: Post = entry[id]
-            embed.addField(`${username || "USERNAME_MISSING"} ${type}:`, post.task, false)
-        }
-        return embed
+const handleNoOptions = async (type: 'will' | 'did'): Promise<string | MessageEmbed> => {
+  const entry: Entry | undefined = await getToday(type)
+  if (entry) {
+    let embed = new MessageEmbed().setTitle(`Today the following tasks are listed for - ${type === 'will' ? '🎯 Today I Will' : '🎉 Today I Did'}`)
+    for (const id in entry) {
+      const username: string | undefined = await getUsername(id)
+      const post: Post = entry[id]
+      embed.addField(`${username || 'USERNAME_MISSING'} ${type}:`, post.task, false)
     }
-    return "No Tasks Found"
+    return embed
+  }
+  return 'No Tasks Found'
 }
 
-const handleUserOptions = async (type: "will" | "did", id: string): Promise<string | MessageEmbed> => {
-    const post: Post | undefined = await getPost(type, id)
-    const username: string | undefined = await getUsername(id)
-    if (post && username) return formatTodayUserResponse(type, username, post.task)
-    return "No Tasks Found"
+const handleUserOptions = async (type: 'will' | 'did', id: string): Promise<string | MessageEmbed> => {
+  const post: Post | undefined = await getPost(type, id)
+  const username: string | undefined = await getUsername(id)
+  if (post && username) return formatTodayUserResponse(type, username, post.task)
+  return 'No Tasks Found'
 }
 
 export const Today: Command = {
@@ -48,23 +47,25 @@ export const Today: Command = {
     },
   ],
   run: async (client: Client, interaction: BaseCommandInteraction) => {
-    let content: string | MessageEmbed = 'No Data was Found, Try Again 😬'
-    const options: any = interaction.options.data
-    const task = options[TYPE_INDEX]
-    if (task) {
+    try {
+      let content: string | MessageEmbed = 'No Data was Found, Try Again 😬'
+      const options: any = interaction.options.data
+      const task = options[TYPE_INDEX]
+      if (task) {
         const type = task.value
-        if (type !== "will" || type !== "did") {
-            const user = options[USER_INDEX]
-            if (user) {
-                content = await handleUserOptions(type, user.value)
-            } else {
-                content = await handleNoOptions(type)
-            }
+        if (type === 'will' || type === 'did') {
+          const user = options[USER_INDEX]
+          content = user ? await handleUserOptions(type, user.value) : await handleNoOptions(type)
         } else {
-            content = "Type as to be `will` or `did`"
+          content = 'Type has to be `will` or `did`'
         }
+      }
+      console.log(`Replying to - Today Command`)
+      let payload: any = typeof content === 'string' ? { content } : { embeds: [content] }
+      await interaction.followUp({ ...payload })
+    } catch (err) {
+      console.warn(err)
+      await interaction.followUp({ content: 'Something went wrong' })
     }
-    let payload: any = typeof content === "string" ? { content }: { embeds: [content] } 
-    await interaction.followUp({ ...payload })
   },
 }
